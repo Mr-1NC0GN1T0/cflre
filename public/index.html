@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>🎤 Voice AI Chat</h2>
+
+<div id="chat"></div>
+
+<button onclick="startListening()">🎤 Speak</button>
+
+<script>
+let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+recognition.onresult = async function(event) {
+  const text = event.results[0][0].transcript;
+
+  addMessage("You", text);
+
+  const res = await fetch("cfl.prabuddha2063.workers.dev", {
+    method: "POST",
+    body: text
+  });
+
+  const aiText = await res.text();
+
+  addMessage("AI", aiText);
+
+  speak(aiText);
+};
+
+function startListening() {
+  recognition.start();
+}
+
+function addMessage(sender, message) {
+  document.getElementById("chat").innerHTML += 
+    `<p><b>${sender}:</b> ${message}</p>`;
+}
+
+function speak(text) {
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "en-US";
+  speech.rate = 1;
+  window.speechSynthesis.speak(speech);
+}
+</script>
+
+</body>
+</html>
